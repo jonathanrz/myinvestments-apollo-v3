@@ -6,7 +6,7 @@ const localStorage = {
       return null;
     }
   },
-  set(name: string, value: string) {
+  set(name: string, value?: string) {
     window.localStorage.setItem(name, JSON.stringify(value));
   },
 };

@@ -7,23 +7,28 @@ import MainPage from "./pages/Main";
 import LoginPage from "./pages/Login";
 
 function App() {
-  const [token, setToken] = useState(() => localStorage.get("token"));
+  const [token, setStateToken] = useState(() => localStorage.get("token"));
 
   const apolloClient = useMemo(
     () =>
       createApolloClient({
         getToken: () => token,
-        onUnauthorized: () => setToken(null),
+        onUnauthorized: () => setToken(undefined),
       }),
     [token]
   );
+
+  function setToken(token?: string) {
+    localStorage.set("token", token);
+    setStateToken(token);
+  }
 
   return (
     <ApolloProvider client={apolloClient}>
       <Router>
         <Routes>
           <Route path="/" element={<MainPage token={token} />} />
-          <Route path="login" element={<LoginPage />} />
+          <Route path="login" element={<LoginPage setToken={setToken} />} />
         </Routes>
       </Router>
     </ApolloProvider>
