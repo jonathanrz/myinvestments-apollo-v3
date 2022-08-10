@@ -5,8 +5,18 @@ import moment from "moment";
 import numbro from "numbro";
 
 const Table = styled.table`
-  padding: 10px;
   border: 1px solid black;
+  white-space: nowrap;
+
+  td,
+  th {
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
 `;
 
 interface Income {
@@ -64,17 +74,17 @@ function Content() {
     return data.investments.map((investment: Investment) => {
       const output = { ...investment, incomes: {} };
       investment.incomes.forEach((income: Income) => {
-        // @ts-ignore
-        output.incomes[moment(income.date * 1000).format("MM/YY")] = {
-          ...income,
-          percent: income.yield / (income.value - income.yield),
-        };
+        if (income.value > 0) {
+          // @ts-ignore
+          output.incomes[moment(income.date * 1000).format("MM/YY")] = {
+            ...income,
+            percent: income.yield / (income.value - income.yield),
+          };
+        }
       });
       return output;
     });
   }, [data]);
-
-  console.log({ parsedData });
 
   return (
     <div>
