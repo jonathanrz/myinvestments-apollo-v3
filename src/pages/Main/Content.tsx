@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import styled from "styled-components";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
+import numbro from "numbro";
 
 const Table = styled.table`
   padding: 10px;
@@ -35,8 +36,6 @@ function generateMonths() {
     return formattedDate;
   });
 }
-
-console.log({ MONTHS });
 
 const GET_ALL_INVESTMENTS = gql`
   {
@@ -91,6 +90,24 @@ function Content() {
               ))}
             </tr>
           </thead>
+          <tbody>
+            {/* @ts-ignore */}
+            {parsedData.map((investment) => (
+              <tr key={investment.uuid}>
+                <td>{investment.name}</td>
+                {MONTHS.map((month) => (
+                  <td key={month}>
+                    {investment.incomes[month]
+                      ? numbro(investment.incomes[month].percent).format({
+                          output: "percent",
+                          mantissa: 2,
+                        })
+                      : "-"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
         </Table>
       )}
     </div>
