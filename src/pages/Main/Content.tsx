@@ -1,5 +1,7 @@
-import React, { useMemo } from "react";
+import { useMemo, useState } from "react";
 import styled from "styled-components";
+import uniq from "lodash/uniq";
+import Select from "react-select";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 import numbro from "numbro";
@@ -67,58 +69,82 @@ const GET_ALL_INVESTMENTS = gql`
 
 function Content() {
   const { loading, error, data } = useQuery(GET_ALL_INVESTMENTS);
+  const [filterType, setFilterType] = useState();
 
   const parsedData = useMemo(() => {
     if (!data) return;
 
-    return data.investments.map((investment: Investment) => {
-      const output = { ...investment, incomes: {} };
-      investment.incomes.forEach((income: Income) => {
-        if (income.value > 0) {
-          // @ts-ignore
-          output.incomes[moment(income.date * 1000).format("MM/YY")] = {
-            ...income,
-            percent: income.yield / (income.value - income.yield),
-          };
-        }
+    return data.investments
+      .filter((investment: Investment) => {
+        if (!filterType) return true;
+
+        return filterType === investment.type;
+      })
+      .map((investment: Investment) => {
+        const output = { ...investment, incomes: {} };
+        investment.incomes.forEach((income: Income) => {
+          if (income.value > 0) {
+            // @ts-ignore
+            output.incomes[moment(income.date * 1000).format("MM/YY")] = {
+              ...income,
+              percent: income.yield / (income.value - income.yield),
+            };
+          }
+        });
+        return output;
       });
-      return output;
-    });
-  }, [data]);
+  }, [data, filterType]);
+
+  const types = useMemo(
+    () => data && uniq(data.investments.map((i: Investment) => i.type)).sort(),
+    [data]
+  );
+
+  console.log({ types });
 
   return (
     <div>
       {loading && "Loading..."}
       {error && error.message}
       {parsedData && (
-        <Table>
-          <thead>
-            <tr>
-              <th>Investment</th>
-              {MONTHS.map((month) => (
-                <th key={month}>{month}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {/* @ts-ignore */}
-            {parsedData.map((investment) => (
-              <tr key={investment.uuid}>
-                <td>{investment.name}</td>
+        <div>
+          <Select
+            options={types.map((type: string) => ({
+              label: type,
+              value: type,
+            }))}
+            // @ts-ignore
+            onChange={(opt) => setFilterType(opt.value)}
+          />
+          <Table>
+            <thead>
+              <tr>
+                <th>Investment</th>
                 {MONTHS.map((month) => (
-                  <td key={month}>
-                    {investment.incomes[month]
-                      ? numbro(investment.incomes[month].percent).format({
-                          output: "percent",
-                          mantissa: 2,
-                        })
-                      : "-"}
-                  </td>
+                  <th key={month}>{month}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {/* @ts-ignore */}
+              {parsedData.map((investment) => (
+                <tr key={investment.uuid}>
+                  <td>{investment.name}</td>
+                  {MONTHS.map((month) => (
+                    <td key={month}>
+                      {investment.incomes[month]
+                        ? numbro(investment.incomes[month].percent).format({
+                            output: "percent",
+                            mantissa: 2,
+                          })
+                        : "-"}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       )}
     </div>
   );
