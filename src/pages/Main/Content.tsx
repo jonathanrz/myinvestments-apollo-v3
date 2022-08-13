@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import sortBy from "lodash/sortBy";
+import sum from "lodash/sum";
 import Select from "react-select";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
@@ -115,6 +116,33 @@ function Content() {
     );
   }, [data, filterType]);
 
+  const average = useMemo(() => {
+    const data = [filterType || "All"];
+
+    MONTHS.forEach((month: string) => {
+      const monthIncomePercents: number[] = [];
+      parsedData?.forEach((investment: Investment) => {
+        // @ts-ignore
+        if (investment.incomes[month] && investment.incomes[month].percent) {
+          // @ts-ignore
+          monthIncomePercents.push(investment.incomes[month].percent);
+        }
+      });
+      if (monthIncomePercents.length) {
+        data.push(
+          numbro(sum(monthIncomePercents) / monthIncomePercents.length).format({
+            output: "percent",
+            mantissa: 2,
+          })
+        );
+      } else {
+        data.push("");
+      }
+    });
+
+    return data;
+  }, [parsedData, filterType]);
+
   const types = useMemo(
     () => data && uniq(data.investments.map((i: Investment) => i.type)).sort(),
     [data]
@@ -161,6 +189,13 @@ function Content() {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr>
+                {average.map((data, index) => (
+                  <TableData key={`${data}-${index}`}>{data}</TableData>
+                ))}
+              </tr>
+            </tfoot>
           </Table>
         </div>
       )}
