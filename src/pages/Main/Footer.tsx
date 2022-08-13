@@ -1,16 +1,8 @@
 import { useMemo } from "react";
-import styled from "styled-components";
 import sum from "lodash/sum";
 import numbro from "numbro";
 import { Investment } from "./models";
-
-const TableData = styled.td`
-  font-size: 15px;
-  color: #808080;
-  line-height: 1.4;
-
-  padding: 4px 8px;
-`;
+import { TableData } from "./styles";
 
 interface FooterProps {
   parsedData: Array<Investment>;

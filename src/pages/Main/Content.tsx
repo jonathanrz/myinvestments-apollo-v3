@@ -7,6 +7,7 @@ import moment from "moment";
 import numbro from "numbro";
 import { Investment, Income } from "./models";
 import Footer from "./Footer";
+import Chart from "./Chart";
 import { Table, TableHeader, TableData } from "./styles";
 
 const MONTHS = generateMonths();
@@ -122,6 +123,7 @@ function Content() {
               filterType={filterType}
             />
           </Table>
+          {filterType && <Chart parsedData={parsedData} MONTHS={MONTHS} />}
         </div>
       )}
     </div>
