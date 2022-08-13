@@ -3,6 +3,13 @@ export interface Income {
   date: number;
   yield: number;
   value: number;
+  percent: number;
+  bought: number;
+  sold: number;
+  gross: number;
+  ir: number;
+  fee: number;
+  received: number;
 }
 
 export interface Investment {

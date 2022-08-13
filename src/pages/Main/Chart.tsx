@@ -1,11 +1,13 @@
 import { useMemo } from "react";
 import numbro from "numbro";
+import omit from "lodash/omit";
+import sum from "lodash/sum";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Investment } from "./models";
 
 interface ChartProps {
   parsedData: Array<Investment>;
-  MONTHS: Array<string>;
+  months: Array<string>;
 }
 
 const COLORS = [
@@ -27,14 +29,14 @@ const COLORS = [
   "#607d8b",
 ];
 
-function Chart({ parsedData, MONTHS }: ChartProps) {
+function Chart({ parsedData, months }: ChartProps) {
   const chartData = useMemo(() => {
     // @ts-ignore
     const data = [];
     const investmentsWithData: Array<string> = [];
 
-    MONTHS.forEach((month) => {
-      const monthData = { month };
+    months.forEach((month) => {
+      const monthData = { month, average: 0 };
 
       parsedData?.forEach((investment) => {
         // @ts-ignore
@@ -47,17 +49,23 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
           }
         }
       });
+
+      const allData = Object.values(omit(monthData, "month")).filter(
+        (v) => v !== 0
+      );
+
+      monthData.average = sum(allData) / allData.length;
       data.push(monthData);
     });
 
     // @ts-ignore
     return { data, investmentsWithData };
-  }, [parsedData, MONTHS]);
+  }, [parsedData, months]);
 
   return (
     <LineChart
-      width={1800}
-      height={800}
+      width={months.length * 70}
+      height={500}
       data={chartData.data}
       margin={{
         top: 50,
@@ -84,6 +92,13 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
         }
       />
       <Legend />
+      <Line
+        type="monotone"
+        dataKey="average"
+        stroke="#000000"
+        dot={false}
+        strokeWidth={2}
+      />
       {chartData.investmentsWithData.map(
         (investmentName: string, index: number) => (
           <Line
@@ -92,7 +107,7 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
             dataKey={investmentName}
             stroke={COLORS[index % COLORS.length]}
             dot={false}
-            strokeWidth={2}
+            strokeWidth={1}
           />
         )
       )}

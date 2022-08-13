@@ -5,10 +5,10 @@ import sortBy from "lodash/sortBy";
 import Select from "react-select";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
-import numbro from "numbro";
 import { Investment, Income } from "./models";
 import Footer from "./Footer";
 import Chart from "./Chart";
+import IncomeCell from "./IncomeCell";
 import { Table, TableHeader, TableData } from "./styles";
 
 const FilterContainer = styled.div`
@@ -63,6 +63,12 @@ const GET_ALL_INVESTMENTS = gql`
         date
         yield
         value
+        bought
+        sold
+        gross
+        ir
+        fee
+        received
       }
     }
   }
@@ -156,12 +162,7 @@ function Content() {
                   <TableData>{investment.name}</TableData>
                   {months.map((month) => (
                     <TableData key={month}>
-                      {investment.incomes[month]
-                        ? numbro(investment.incomes[month].percent).format({
-                            output: "percent",
-                            mantissa: 2,
-                          })
-                        : ""}
+                      <IncomeCell income={investment.incomes[month]} />
                     </TableData>
                   ))}
                 </tr>
@@ -173,7 +174,7 @@ function Content() {
               filterType={filterType}
             />
           </Table>
-          {filterType && <Chart parsedData={parsedData} MONTHS={months} />}
+          {filterType && <Chart parsedData={parsedData} months={months} />}
         </div>
       )}
     </div>
