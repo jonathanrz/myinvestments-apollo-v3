@@ -12,7 +12,7 @@ interface FooterProps {
 
 function Footer({ parsedData, filterType, MONTHS }: FooterProps) {
   const average = useMemo(() => {
-    const data = [filterType || "All"];
+    const data = [(filterType || "All") + " (average)"];
 
     MONTHS.forEach((month: string) => {
       const monthIncomePercents: number[] = [];

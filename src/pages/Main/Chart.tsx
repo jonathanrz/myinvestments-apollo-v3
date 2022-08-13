@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import numbro from "numbro";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Investment } from "./models";
 
@@ -14,11 +15,9 @@ const COLORS = [
   "#673ab7",
   "#3f51b5",
   "#2196f3",
-  "#03a9f4",
   "#00bcd4",
   "#009688",
   "#4caf50",
-  "#8bc34a",
   "#cddc39",
   "#ffeb3b",
   "#ffc107",
@@ -41,8 +40,7 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
         // @ts-ignore
         if (investment.incomes[month] && investment.incomes[month].percent) {
           // @ts-ignore
-          monthData[investment.name] = (investment.incomes[month].percent * 100) // @ts-ignore
-            .toFixed(2);
+          monthData[investment.name] = investment.incomes[month].percent;
 
           if (!investmentsWithData.includes(investment.name)) {
             investmentsWithData.push(investment.name);
@@ -58,7 +56,7 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
 
   return (
     <LineChart
-      width={1900}
+      width={1800}
       height={800}
       data={chartData.data}
       margin={{
@@ -68,8 +66,23 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
       }}
     >
       <XAxis dataKey="month" />
-      <YAxis />
-      <Tooltip />
+      <YAxis
+        type="number"
+        tickFormatter={(tick) =>
+          numbro(tick).format({
+            output: "percent",
+            mantissa: 2,
+          })
+        }
+      />
+      <Tooltip
+        formatter={(tick: number) =>
+          numbro(tick).format({
+            output: "percent",
+            mantissa: 2,
+          })
+        }
+      />
       <Legend />
       {chartData.investmentsWithData.map(
         (investmentName: string, index: number) => (
@@ -78,7 +91,8 @@ function Chart({ parsedData, MONTHS }: ChartProps) {
             type="monotone"
             dataKey={investmentName}
             stroke={COLORS[index % COLORS.length]}
-            activeDot={{ r: 8 }}
+            dot={false}
+            strokeWidth={2}
           />
         )
       )}
