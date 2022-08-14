@@ -69,7 +69,7 @@ function Chart({ parsedData, months, selectedInvestment }: ChartProps) {
     if (selectedInvestment) {
       if (selectedInvestment.name === investmentName) return "red";
 
-      return "gray";
+      return "#dddddd";
     }
     return COLORS[index % COLORS.length];
   }
