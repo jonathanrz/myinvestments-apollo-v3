@@ -2,12 +2,15 @@ import { useMemo } from "react";
 import numbro from "numbro";
 import omit from "lodash/omit";
 import sum from "lodash/sum";
+import min from "lodash/min";
+import max from "lodash/max";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Investment } from "./models";
 
 interface ChartProps {
   parsedData: Array<Investment>;
   months: Array<string>;
+  selectedInvestment?: Investment;
 }
 
 const COLORS = [
@@ -29,7 +32,7 @@ const COLORS = [
   "#607d8b",
 ];
 
-function Chart({ parsedData, months }: ChartProps) {
+function Chart({ parsedData, months, selectedInvestment }: ChartProps) {
   const chartData = useMemo(() => {
     // @ts-ignore
     const data = [];
@@ -62,10 +65,19 @@ function Chart({ parsedData, months }: ChartProps) {
     return { data, investmentsWithData };
   }, [parsedData, months]);
 
+  function getLineColor(investmentName: string, index: number) {
+    if (selectedInvestment) {
+      if (selectedInvestment.name === investmentName) return "red";
+
+      return "gray";
+    }
+    return COLORS[index % COLORS.length];
+  }
+
   return (
     <LineChart
-      width={months.length * 70}
-      height={500}
+      width={min([months.length * 120, 1800])}
+      height={max([chartData.investmentsWithData.length * 30, 500])}
       data={chartData.data}
       margin={{
         top: 50,
@@ -95,9 +107,9 @@ function Chart({ parsedData, months }: ChartProps) {
       <Line
         type="monotone"
         dataKey="average"
-        stroke="#000000"
+        stroke="#0000FF"
         dot={false}
-        strokeWidth={2}
+        strokeWidth={3}
       />
       {chartData.investmentsWithData.map(
         (investmentName: string, index: number) => (
@@ -105,9 +117,13 @@ function Chart({ parsedData, months }: ChartProps) {
             key={investmentName}
             type="monotone"
             dataKey={investmentName}
-            stroke={COLORS[index % COLORS.length]}
+            stroke={getLineColor(investmentName, index)}
             dot={false}
-            strokeWidth={1}
+            strokeWidth={
+              selectedInvestment && selectedInvestment.name === investmentName
+                ? 2
+                : 1
+            }
           />
         )
       )}

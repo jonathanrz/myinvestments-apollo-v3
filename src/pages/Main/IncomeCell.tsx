@@ -11,9 +11,10 @@ const Popup = styled.div`
 
   position: absolute;
   left: 0;
-  bottom: 0;
+  top: 0;
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-  margin-bottom: 22px;
+  margin-top: 22px;
+  z-index: 2;
 
   display: none;
 `;

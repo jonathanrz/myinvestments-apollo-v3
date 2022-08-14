@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import sum from "lodash/sum";
@@ -23,6 +23,17 @@ const FilterContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-gap: 20px;
+`;
+
+interface TableRowProps {
+  isSelected: boolean;
+}
+
+const TableRow = styled.tr`
+  td {
+    color: ${(props: TableRowProps) =>
+      props.isSelected ? "red" : "#808080"} !important;
+  }
 `;
 
 const TIME_OPTIONS = [
@@ -86,11 +97,14 @@ function Content() {
   const { loading, error, data } = useQuery(GET_ALL_INVESTMENTS);
   const [filterType, setFilterType] = useState();
   const [timeSelected, setTimeSelected] = useState(TIME_OPTIONS[0]);
+  const [selectedInvestment, setSelectedInvestment] = useState();
 
   const months = useMemo(
     () => generateMonths(timeSelected.value),
     [timeSelected]
   );
+
+  useEffect(() => setSelectedInvestment(undefined), [filterType]);
 
   const parsedData = useMemo(() => {
     if (!data) return;
@@ -164,6 +178,9 @@ function Content() {
               // @ts-ignore
               onChange={setTimeSelected}
               value={timeSelected}
+              styles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
             />
             <Select
               options={types.map((type: string) => ({
@@ -172,6 +189,9 @@ function Content() {
               }))}
               // @ts-ignore
               onChange={(opt) => setFilterType(opt.value)}
+              styles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
             />
           </FilterContainer>
           <Table>
@@ -187,7 +207,15 @@ function Content() {
             <tbody>
               {/* @ts-ignore */}
               {parsedData.map((investment) => (
-                <tr key={investment.uuid}>
+                <TableRow
+                  key={investment.uuid}
+                  isSelected={investment === selectedInvestment}
+                  onClick={() =>
+                    setSelectedInvestment(
+                      investment === selectedInvestment ? null : investment
+                    )
+                  }
+                >
                   <TableData>{investment.name}</TableData>
                   <TablePercentData align="right">
                     {/* @ts-ignore */}
@@ -201,7 +229,7 @@ function Content() {
                       <IncomeCell income={investment.incomes[month]} />
                     </TablePercentData>
                   ))}
-                </tr>
+                </TableRow>
               ))}
             </tbody>
             <Footer
@@ -210,7 +238,13 @@ function Content() {
               filterType={filterType}
             />
           </Table>
-          {filterType && <Chart parsedData={parsedData} months={months} />}
+          {filterType && (
+            <Chart
+              parsedData={parsedData}
+              months={months}
+              selectedInvestment={selectedInvestment}
+            />
+          )}
         </div>
       )}
     </div>
