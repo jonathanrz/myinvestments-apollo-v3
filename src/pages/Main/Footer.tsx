@@ -2,19 +2,19 @@ import { useMemo } from "react";
 import sum from "lodash/sum";
 import numbro from "numbro";
 import { Investment } from "./models";
-import { TableData } from "./styles";
+import { TableData, TablePercentData } from "./styles";
 
 interface FooterProps {
   parsedData: Array<Investment>;
   filterType: string | undefined;
-  MONTHS: Array<string>;
+  months: Array<string>;
 }
 
-function Footer({ parsedData, filterType, MONTHS }: FooterProps) {
+function Footer({ parsedData, filterType, months }: FooterProps) {
   const average = useMemo(() => {
-    const data = [(filterType || "All") + " (average)"];
+    const data: Array<string | number> = [];
 
-    MONTHS.forEach((month: string) => {
+    months.forEach((month: string) => {
       const monthIncomePercents: number[] = [];
       parsedData?.forEach((investment: Investment) => {
         // @ts-ignore
@@ -24,26 +24,38 @@ function Footer({ parsedData, filterType, MONTHS }: FooterProps) {
         }
       });
       if (monthIncomePercents.length) {
-        data.push(
-          numbro(sum(monthIncomePercents) / monthIncomePercents.length).format({
-            output: "percent",
-            mantissa: 2,
-          })
-        );
+        data.push(sum(monthIncomePercents) / monthIncomePercents.length);
       } else {
         data.push("");
       }
     });
 
-    return data;
-  }, [parsedData, filterType, MONTHS]);
+    const monthsWithData = data.filter((a) => a);
+
+    return [
+      (filterType || "All") + " (average)",
+      sum(monthsWithData) / monthsWithData.length,
+      ...data,
+    ];
+  }, [parsedData, filterType, months]);
 
   return (
     <tfoot>
       <tr>
-        {average.map((data, index) => (
-          <TableData key={`${data}-${index}`}>{data}</TableData>
-        ))}
+        {average.map((data, index) => {
+          if (index === 0) {
+            return <TableData key={`${data}-${index}`}>{data}</TableData>;
+          }
+          return (
+            <TablePercentData key={`${data}-${index}`}>
+              {data &&
+                numbro(data).format({
+                  output: "percent",
+                  mantissa: 2,
+                })}
+            </TablePercentData>
+          );
+        })}
       </tr>
     </tfoot>
   );

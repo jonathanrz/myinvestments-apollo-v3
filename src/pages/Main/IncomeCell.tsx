@@ -28,6 +28,10 @@ const Container = styled.div`
   }
 `;
 
+const ValueCell = styled.td`
+  text-align: left;
+`;
+
 interface IncomeCellProps {
   income: Income;
 }
@@ -42,16 +46,19 @@ function IncomeCell({ income }: IncomeCellProps) {
           })
         : ""}
       <Popup>
-        <ul>
+        <table>
           {Object.entries(
             omit(income, ["date", "uuid", "__typename", "percent"])
           ).map(([key, value]) => (
-            <li key={key}>
+            <tr key={key}>
+              <td>
+                <b>{key}</b>
+              </td>
               {/* @ts-ignore */}
-              <b>{key}</b>: R$ {value / 100}
-            </li>
+              <ValueCell>R$ {value / 100}</ValueCell>
+            </tr>
           ))}
-        </ul>
+        </table>
       </Popup>
     </Container>
   );

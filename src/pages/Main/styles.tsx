@@ -14,6 +14,7 @@ export const TableHeader = styled.th`
   position: sticky;
   top: 0;
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+  z-index: 1;
 
   font-size: 18px;
   color: #fff;
@@ -23,10 +24,18 @@ export const TableHeader = styled.th`
   padding: 4px 8px;
 `;
 
+export const TablePercentHeader = styled(TableHeader)`
+  text-align: right;
+`;
+
 export const TableData = styled.td`
   font-size: 15px;
   color: #808080;
   line-height: 1.4;
 
   padding: 4px 8px;
+`;
+
+export const TablePercentData = styled(TableData)`
+  text-align: right;
 `;

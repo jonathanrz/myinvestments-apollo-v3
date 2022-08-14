@@ -1,15 +1,23 @@
 import { useMemo, useState } from "react";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
+import sum from "lodash/sum";
 import sortBy from "lodash/sortBy";
 import Select from "react-select";
+import numbro from "numbro";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 import { Investment, Income } from "./models";
 import Footer from "./Footer";
 import Chart from "./Chart";
 import IncomeCell from "./IncomeCell";
-import { Table, TableHeader, TableData } from "./styles";
+import {
+  Table,
+  TableHeader,
+  TableData,
+  TablePercentHeader,
+  TablePercentData,
+} from "./styles";
 
 const FilterContainer = styled.div`
   display: grid;
@@ -119,6 +127,26 @@ function Content() {
     );
   }, [data, filterType, months]);
 
+  const investmentsAverage = useMemo(() => {
+    if (!parsedData) return;
+
+    const output = {};
+
+    parsedData.forEach((investment) => {
+      const percents = months
+        .map(
+          (month) =>
+            investment.incomes[month] && investment.incomes[month].percent
+        )
+        .filter((a) => a);
+
+      // @ts-ignore
+      output[investment.name] = sum(percents) / (percents.length || 1);
+    });
+
+    return output;
+  }, [parsedData, months]);
+
   const types = useMemo(
     () => data && uniq(data.investments.map((i: Investment) => i.type)).sort(),
     [data]
@@ -150,8 +178,9 @@ function Content() {
             <thead>
               <tr>
                 <TableHeader>Investment</TableHeader>
+                <TablePercentHeader>Average</TablePercentHeader>
                 {months.map((month) => (
-                  <TableHeader key={month}>{month}</TableHeader>
+                  <TablePercentHeader key={month}>{month}</TablePercentHeader>
                 ))}
               </tr>
             </thead>
@@ -160,17 +189,24 @@ function Content() {
               {parsedData.map((investment) => (
                 <tr key={investment.uuid}>
                   <TableData>{investment.name}</TableData>
+                  <TablePercentData align="right">
+                    {/* @ts-ignore */}
+                    {numbro(investmentsAverage[investment.name]).format({
+                      output: "percent",
+                      mantissa: 2,
+                    })}
+                  </TablePercentData>
                   {months.map((month) => (
-                    <TableData key={month}>
+                    <TablePercentData key={month}>
                       <IncomeCell income={investment.incomes[month]} />
-                    </TableData>
+                    </TablePercentData>
                   ))}
                 </tr>
               ))}
             </tbody>
             <Footer
               parsedData={parsedData}
-              MONTHS={months}
+              months={months}
               filterType={filterType}
             />
           </Table>
