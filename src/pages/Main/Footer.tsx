@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import sum from "lodash/sum";
 import numbro from "numbro";
-import { Investment } from "./models";
-import { TableData, TablePercentData } from "./styles";
+import { Investment } from "../../shared/models";
+import { TableData, TablePercentData } from "../../shared/styles";
 
 interface FooterProps {
   parsedData: Array<Investment>;

@@ -5,7 +5,7 @@ import sum from "lodash/sum";
 import min from "lodash/min";
 import max from "lodash/max";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
-import { Investment } from "./models";
+import { Investment } from "../../shared/models";
 
 interface ChartProps {
   parsedData: Array<Investment>;

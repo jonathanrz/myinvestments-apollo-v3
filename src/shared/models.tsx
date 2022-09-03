@@ -19,4 +19,6 @@ export interface Investment {
   holder: string;
   objective: string;
   incomes: [Income];
+  lastIncome: Income;
+  value: number;
 }

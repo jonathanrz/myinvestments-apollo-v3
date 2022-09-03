@@ -25,7 +25,7 @@ function Login({ setToken }: LoginProps) {
 
     const { login } = data;
     setToken(login);
-    navigate("/", { replace: true });
+    navigate("/main", { replace: true });
   }, [data, setToken, navigate]);
 
   return (

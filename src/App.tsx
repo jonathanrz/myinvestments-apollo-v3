@@ -4,6 +4,7 @@ import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import createApolloClient from "./utils/createApolloClient";
 import localStorage from "./utils/localStorage";
 import MainPage from "./pages/Main";
+import StocksPage from "./pages/Stocks";
 import LoginPage from "./pages/Login";
 
 function App() {
@@ -27,8 +28,9 @@ function App() {
     <ApolloProvider client={apolloClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<MainPage token={token} />} />
           <Route path="login" element={<LoginPage setToken={setToken} />} />
+          <Route path="stocks" element={<StocksPage token={token} />} />
+          <Route path="/" element={<MainPage token={token} />} />
         </Routes>
       </Router>
     </ApolloProvider>

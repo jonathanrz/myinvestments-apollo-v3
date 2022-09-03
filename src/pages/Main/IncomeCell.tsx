@@ -1,7 +1,7 @@
 import numbro from "numbro";
 import styled from "styled-components";
 import omit from "lodash/omit";
-import { Income } from "./models";
+import { Income } from "../../shared/models";
 
 const Popup = styled.div`
   background-color: white;

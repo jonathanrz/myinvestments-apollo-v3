@@ -7,7 +7,7 @@ import Select from "react-select";
 import numbro from "numbro";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
-import { Investment, Income } from "./models";
+import { Investment, Income } from "../../shared/models";
 import Footer from "./Footer";
 import Chart from "./Chart";
 import IncomeCell from "./IncomeCell";
@@ -17,7 +17,7 @@ import {
   TableData,
   TablePercentHeader,
   TablePercentData,
-} from "./styles";
+} from "../../shared/styles";
 
 const FilterContainer = styled.div`
   display: grid;
