@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import groupBy from "lodash/groupBy";
 import sumBy from "lodash/sumBy";
+import sum from "lodash/sum";
 import sortBy from "lodash/sortBy";
 import numbro from "numbro";
 import { Investment } from "../../shared/models";
@@ -28,6 +29,26 @@ const GET_ACTIVE_INVESTMENTS = gql`
     }
   }
 `;
+
+const DESIRED_PERCENTAGE = {
+  ALSO3: 0.05,
+  AMER3: 0.04,
+  B3SA3: 0.07,
+  BBAS3: 0.1,
+  BBSE3: 0.09,
+  CIEL3: 0.05,
+  CYRE3: 0.06,
+  GMAT3: 0.11,
+  GOAU4: 0.055,
+  HYPE3: 0.065,
+  LREN3: 0.05,
+  MGLU3: 0.13,
+  QUAL3: 0.06,
+  RDOR3: 0.04,
+  SANB11: 0.08,
+  VIVT4: 0.06,
+  WEGE3: 0.04,
+};
 
 function parseData(investment: [Investment]) {
   if (!investment) return [];
@@ -77,6 +98,7 @@ function Content() {
               <TableHeader>Investment</TableHeader>
               <TablePercentHeader>Value</TablePercentHeader>
               <TablePercentHeader>Percent</TablePercentHeader>
+              <TablePercentHeader>Desired</TablePercentHeader>
             </tr>
           </thead>
           <tbody>
@@ -96,6 +118,13 @@ function Content() {
                     mantissa: 2,
                   })}
                 </TablePercentData>
+                <TablePercentData>
+                  {/* @ts-ignore */}
+                  {numbro(DESIRED_PERCENTAGE[investment.name] || 0).format({
+                    output: "percent",
+                    mantissa: 2,
+                  })}
+                </TablePercentData>
               </tr>
             ))}
           </tbody>
@@ -109,6 +138,12 @@ function Content() {
                 })}
               </TablePercentData>
               <TablePercentData>100%</TablePercentData>
+              <TablePercentData>
+                {numbro(sum(Object.values(DESIRED_PERCENTAGE))).format({
+                  output: "percent",
+                  mantissa: 2,
+                })}
+              </TablePercentData>
             </tr>
           </tfoot>
         </Table>
